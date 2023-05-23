@@ -72,6 +72,14 @@ def update(i):              # ここのiは下のframes=fに対応した引数�
     time_text.set_text(time_template % (i*dt))
     return rod, triangle, mass, time_text
 
+'''
+y_triの中の重要部分は
+x_tri1 = np.linspace(a, b,100)
+のとき
+(xtri - a)/(b - a)
+になる 
+'''
+
 f = np.arange(0, len(t))
 frame_int = 1000 * dt       # [ms] interval between frames
 fps = 1000/frame_int        # frames per second
