@@ -23,8 +23,9 @@ l3 = 20                     # [m] equilibrium length
 L = l1 + l2 + l3
 af1 = np.sqrt(k1/m)         # angular frequency   
 af2 = np.sqrt((k1+2*k2)/m)  # angular frequency
-period = 2*np.pi/af1        # period of af1[s] (T)  
-t = 4*period                # [s] duration time
+peri1 = 2*np.pi/af1         # period of af1[s] (T1)
+peri2 = 2*np.pi/af2         # period of af1[s] (T2)    
+tmax = 2*peri1              # [s] duration time
 dt = 0.05                   # [s] interval time
 
 # initial condition
@@ -47,7 +48,7 @@ except ValueError:
 
 s0 = [x1_0, v1_0, x2_0, v2_0]   # initial condition
 
-t = np.arange(0, t+dt, dt)
+t = np.arange(0, tmax, dt)
 
 sol = odeint(coupledHarmonicOscillator, s0, t, args=(k1, k2, m))  # ODEの解を求めている
 x1, x2 = sol[:, 0], sol[:, 2]   # [x1], [x2]が出てくる
@@ -65,6 +66,9 @@ norm1, = plt.plot([], [], 'bo-', animated=True)
 norm2, = plt.plot([], [], 'go-', animated=True)
 # ここでは[],[]としているが、下でlinei.set_dataで実際の値を入れている
 
+peri_template = '$T_1$ = {0:.2f} s, $T_2$ = {1:.2f} s'.format(peri1,peri2)
+peri_text = ax.text(0.1, 0.8, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+
 time_template = 'time = %.1fs'
 time_text = ax.text(0.1, 0.9, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 # また、ここでは''としているが、下で time_text.set_textで実際のテキストを入れている
@@ -72,12 +76,14 @@ time_text = ax.text(0.1, 0.9, '', transform=ax.transAxes) # 図形の枠を基�
 # 基準モード描画あり
 def init_w():               # FuncAnimationでinit_funcで呼び出す
     time_text.set_text('')
-    return line, norm1, norm2, time_text
+    peri_text.set_text('')
+    return line, norm1, norm2, time_text, peri_text
 
 # 基準モード描画なし
 def init_wo():              # FuncAnimationでinit_funcで呼び出す
     time_text.set_text('')
-    return line, time_text
+    peri_text.set_text('')
+    return line, time_text, peri_text
 
 # 基準モード描画あり
 def update_w(i):             # ここのiは下のframes=np.arange(0, len(t))に対応した引数になっている
@@ -85,13 +91,15 @@ def update_w(i):             # ここのiは下のframes=np.arange(0, len(t))に
     norm1.set_data([0, L/2 + q1[i]], [1, 1])    # L/2を中心に描画
     norm2.set_data([0, L/2 + q2[i]], [2, 2])
     time_text.set_text(time_template % (i*dt))
-    return line, norm1, norm2, time_text
+    peri_text.set_text(peri_template)
+    return line, norm1, norm2, time_text, peri_text
 
 # 基準モード描画なし
 def update_wo(i):            # ここのiは下のframes=np.arange(0, len(t))に対応した引数になっている
     line.set_data([0, l1 + x1[i], l1 + l2 + x2[i], L], [0, 0, 0, 0])
     time_text.set_text(time_template % (i*dt))
-    return line, time_text
+    peri_text.set_text(peri_template)
+    return line, time_text, peri_text
 
 f = np.arange(0, len(t))
 frame_int = 1000 * dt       # [ms] interval between frames
