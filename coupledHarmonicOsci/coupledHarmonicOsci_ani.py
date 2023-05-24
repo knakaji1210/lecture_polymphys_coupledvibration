@@ -29,21 +29,21 @@ dt = 0.05                   # [s] interval time
 
 # initial condition
 try:
-    x1_0 = int(input('initial position of mass1 (default=5): '))
+    x1_0 = float(input('initial position of mass1 (default=5.0): '))
 except ValueError:
-    x1_0 = 5
+    x1_0 = 5.0
 try:
-    x2_0 = int(input('initial position of mass2 (default=10): '))
+    x2_0 = float(input('initial position of mass2 (default=10.0): '))
 except ValueError:
-    x2_0 = 10
+    x2_0 = 10.0
 try:
-    v1_0 = int(input('initial velocity of mass1 (default=0): '))
+    v1_0 = float(input('initial velocity of mass1 (default=0.0): '))
 except ValueError:
-    v1_0 = 0
+    v1_0 = 0.0
 try:
-    v2_0 = int(input('initial velocity of mass2 (default=0): '))
+    v2_0 = float(input('initial velocity of mass2 (default=0.0): '))
 except ValueError:
-    v2_0 = 0
+    v2_0 = 0.0
 
 s0 = [x1_0, v1_0, x2_0, v2_0]   # initial condition
 
@@ -105,14 +105,14 @@ except:
 if n_mode == "y": # 基準モードを描画する場合
     ani = FuncAnimation(fig, update_w, frames=f,
                     init_func=init_w, blit=True, interval=frame_int, repeat=True)
-    savefile = './gif/coupledHarmonicOsci_wn_(x1={0},v1={1},x2={2},v2={3}).gif'.format(x1_0,v1_0,x2_0,v2_0)
+    savefile = './gif/coupledHarmonicOsci_wn_(x1={0:.1f},v1={1:.1f},x2={2:.1f},v2={3:.1f}).gif'.format(x1_0,v1_0,x2_0,v2_0)
     ani.save(savefile, writer='pillow', fps=fps)
     plt.show()
 
 elif n_mode == "n": # 基準モードを描画しない場合
     ani = FuncAnimation(fig, update_wo, frames=f,
                     init_func=init_wo, blit=True, interval=frame_int, repeat=True)
-    savefile = './gif/coupledHarmonicOsci_won_(x1={0},v1={1},x2={2},v2={3}).gif'.format(x1_0,v1_0,x2_0,v2_0)
+    savefile = './gif/coupledHarmonicOsci_won_(x1={0:.1f},v1={1:.1f},x2={2:.1f},v2={3:.1f}).gif'.format(x1_0,v1_0,x2_0,v2_0)
     ani.save(savefile, writer='pillow', fps=fps)
     plt.show()
 else:
