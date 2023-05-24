@@ -15,16 +15,17 @@ def tripledharmonicOscillator(s, t, k, m):
     return dsdt
 
 # variables
-k = 10                      # [N/m] spring constant
+k = 30                      # [N/m] spring constant
 m = 10                      # [kg] mass
 l1 = 20                     # [m] equilibrium length
 l2 = 20                     # [m] equilibrium length
 l3 = 20                     # [m] equilibrium length
 l4 = 20                     # [m] equilibrium length
 L = l1 + l2 + l3 + l4
-af = np.sqrt(2*k/m)         # angular frequency
-period = 2*np.pi/af         # period of af1[s] (T)       
-t = 4*period                # [s] duration time
+n = 3                       # number of mass
+af = [2*np.sqrt(k/m)*np.sin((i+1)*np.pi/(2*(n+1))) for i in range(n)]    # angular frequencies
+peri = [2*np.pi/af[i] for i in range(n)]                                 # periods of af [s] (T)
+tmax = 2*peri[0]             # [s] duration time
 dt = 0.05                   # [s] interval time
 
 # initial condition
@@ -55,7 +56,7 @@ except ValueError:
 
 s0 = [x1_0, v1_0, x2_0, v2_0, x3_0, v3_0]   # initial condition
 
-t = np.arange(0, t+dt, dt)
+t = np.arange(0, tmax, dt)
 
 sol = odeint(tripledharmonicOscillator, s0, t, args=(k, m))  # ODEの解を求めている
 x1, x2, x3 = sol[:, 0], sol[:, 2], sol[:, 4]    # [x1], [x2], [x3]が出てくる
@@ -75,13 +76,17 @@ norm2, = plt.plot([], [], 'go-', animated=True)
 norm3, = plt.plot([], [], 'yo-', animated=True)
 # ここでは[],[]としているが、下でlinei.set_dataで実際の値を入れている
 
-time_template = 'time = %.1fs'
-time_text = ax.text(0.1, 0.9, '', transform=ax.transAxes)
+peri_template = '$T_1$ = {0:.2f} s, $T_2$ = {1:.2f} s, $T_3$ = {2:.2f} s'.format(peri[0],peri[1],peri[2])
+peri_text = ax.text(0.1, 0.85, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+
+time_template = '$t$ = %.2f s'
+time_text = ax.text(0.1, 0.92, '', transform=ax.transAxes)
 # また、ここでは''としているが、下で time_text.set_textで実際のテキストを入れている
 
 def init():                 # FuncAnimationでinit_funcで呼び出す
     time_text.set_text('')
-    return line, norm1, norm2, norm3, time_text
+    peri_text.set_text('')
+    return line, norm1, norm2, norm3, time_text, peri_text
 
 def update(i):              # ここのiは下のframes=np.arange(0, len(t))に対応した引数になっている
     line.set_data([0, l1, l1 + l2, l1 + l2 + l3, L], [0, x1[i], x2[i], x3[i], 0])
@@ -89,7 +94,8 @@ def update(i):              # ここのiは下のframes=np.arange(0, len(t))に�
     norm2.set_data([0, L/2 + q2[i]], [2*l1, 2*l1])
     norm3.set_data([0, L/2 + q3[i]], [3*l1, 3*l1])
     time_text.set_text(time_template % (i*dt))
-    return line, norm1, norm2, norm3, time_text
+    peri_text.set_text(peri_template)
+    return line, norm1, norm2, norm3, time_text, peri_text
 
 f = np.arange(0, len(t))
 frame_int = 1000 * dt       # [ms] interval between frames
