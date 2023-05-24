@@ -35,9 +35,9 @@ s0 = [x0, v0]               # initial condition
 t = np.arange(0, t+dt, dt)
 
 sol = odeint(harmonicOscillator, s0, t, args=(k,m))  # ODEの解を求めている
-print(sol.shape) # (len(t), 2)が出てくる。sol = [[x],[v]]ということ
+#print(sol.shape) # (len(t), 2)が出てくる。sol = [[x],[v]]ということ
 x = sol[:, 0]    # [x]が出てくる
-print(x.shape)
+#print(x.shape)
 
 fig = plt.figure()
 ax = fig.add_subplot(111, xlim=(-5, 50), ylim=(-5, 5))
@@ -70,7 +70,7 @@ fps = 1000/frame_int        # frames per second
 ani = FuncAnimation(fig, update, frames=f,
                     init_func=init, blit=True, interval=frame_int, repeat=True)
 
-savefile = './gif/harmonicOscillator_(x0={0},v0={1}).gif'.format(x0,v0)
+savefile = './gif/harmonicOsci_(x={0},v={1}).gif'.format(x0,v0)
 ani.save(savefile, writer='pillow', fps=fps)
 
 plt.show()
