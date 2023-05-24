@@ -79,7 +79,7 @@ norm2, = plt.plot([], [], 'go-', markersize='10', animated=True)
 peri_template = '$T_1$ = {0:.2f} s, $T_2$ = {1:.2f} s'.format(peri1,peri2)
 peri_text = ax.text(0.1, 0.8, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
-time_template = 'time = %.2f s'
+time_template = '$t$ = %.2f s'
 time_text = ax.text(0.1, 0.9, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 # また、ここでは''としているが、下で time_text.set_textで実際のテキストを入れている
 
