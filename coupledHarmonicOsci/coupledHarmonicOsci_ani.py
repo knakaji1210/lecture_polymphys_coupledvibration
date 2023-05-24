@@ -105,14 +105,14 @@ except:
 if n_mode == "y": # 基準モードを描画する場合
     ani = FuncAnimation(fig, update_w, frames=f,
                     init_func=init_w, blit=True, interval=frame_int, repeat=True)
-    savefile = './gif/coupledHarmonicOsci_w_normal_(x0={0},v0={1}, x1={2},v1={3}).gif'.format(x1_0,v1_0,x2_0,v2_0)
+    savefile = './gif/coupledHarmonicOsci_wn_(x1={0},v1={1},x2={2},v2={3}).gif'.format(x1_0,v1_0,x2_0,v2_0)
     ani.save(savefile, writer='pillow', fps=fps)
     plt.show()
 
 elif n_mode == "n": # 基準モードを描画しない場合
     ani = FuncAnimation(fig, update_wo, frames=f,
                     init_func=init_wo, blit=True, interval=frame_int, repeat=True)
-    savefile = './gif/coupledHarmonicOsci_wo_normal_(x0={0},v0={1}, x1={2},v1={3}).gif'.format(x1_0,v1_0,x2_0,v2_0)
+    savefile = './gif/coupledHarmonicOsci_won_(x1={0},v1={1},x2={2},v2={3}).gif'.format(x1_0,v1_0,x2_0,v2_0)
     ani.save(savefile, writer='pillow', fps=fps)
     plt.show()
 else:

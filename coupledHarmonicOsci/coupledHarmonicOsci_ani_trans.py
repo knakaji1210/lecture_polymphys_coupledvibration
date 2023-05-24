@@ -9,7 +9,6 @@ def coupledHarmonicOscillator(s, t, k1, k2, m):
 
     x1, v1, x2, v2 = s              # s = (x1, v1, x2, v2)
     a1 = - (k1+k2)*x1/m + k2*x2/m   
-    a1 = - (k1+k2)*x1/m + k2*x2/m
     a2 = k2*x1/m - (k1+k2)*x2/m
     dsdt = [v1, a1, v2, a2]
     return dsdt
@@ -26,7 +25,7 @@ af1 = np.sqrt(k1/m)         # angular frequency
 af2 = np.sqrt((k1+2*k2)/m)  # angular frequency
 period = 2*np.pi/af1        # period of af1[s] (T)   
 t = 4*period                # [s] duration time
-dt = 0.05                    # [s] interval time
+dt = 0.05                   # [s] interval time
 
 # initial condition
 try:
@@ -88,7 +87,7 @@ fps = 1000/frame_int        # frames per second
 ani = FuncAnimation(fig, update, frames=f,
                     init_func=init, blit=True, interval=frame_int, repeat=True)
 
-savefile = './gif/coupledHarmonicOsci_transverse_(x0={0},v0={1}, x1={2},v1={3}).gif'.format(x1_0,v1_0,x2_0,v2_0)
+savefile = './gif/coupledHarmonicOsci_t_(x1={0},x2={1}).gif'.format(x1_0,x2_0)
 ani.save(savefile, writer='pillow', fps=fps)
 
 plt.show()

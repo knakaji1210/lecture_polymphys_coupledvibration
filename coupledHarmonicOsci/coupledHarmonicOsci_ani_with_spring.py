@@ -56,7 +56,7 @@ q2 = (1/np.sqrt(2))*(-x1 + x2)  # normal mode q2
 
 fig = plt.figure()
 ax = fig.add_subplot(111, xlim=(0, L), ylim=(-1, 3))
-#ax = fig.add_subplot(111, xlim=(0, L), ylim=(-0.75, 0.75))
+#ax = fig.add_subplot(111, xlim=(0, L), ylim=(-1.5, 1.5))
 ax.grid()
 ax.set_axisbelow(True)
 ax.set_xlabel('$x$ position [m]')
@@ -149,14 +149,14 @@ except:
 if n_mode == "y": # 基準モードを描画する場合
     ani = FuncAnimation(fig, update_w, frames=f,
                     init_func=init_w, blit=True, interval=frame_int, repeat=True)
-    savefile = './gif/coupledHarmonicOsci_w_normal_with_spring_(x0={0},v0={1}, x1={2},v1={3}).gif'.format(x1_0,v1_0,x2_0,v2_0)
+    savefile = './gif/coupledHarmonicOsci_wn_wsp_(x1={0},v1={1},x2={2},v2={3}).gif'.format(x1_0,v1_0,x2_0,v2_0)
     ani.save(savefile, writer='pillow', fps=fps)
     plt.show()
 
 elif n_mode == "n": # 基準モードを描画しない場合
     ani = FuncAnimation(fig, update_wo, frames=f,
                     init_func=init_wo, blit=True, interval=frame_int, repeat=True)
-    savefile = './gif/coupledHarmonicOsci_wo_normal_with_spring_(x0={0},v0={1}, x1={2},v1={3}).gif'.format(x1_0,v1_0,x2_0,v2_0)
+    savefile = './gif/coupledHarmonicOsci_won_wsp_(x1={0},v1={1},x2={2},v2={3}).gif'.format(x1_0,v1_0,x2_0,v2_0)
     ani.save(savefile, writer='pillow', fps=fps)
     plt.show()
 else:
