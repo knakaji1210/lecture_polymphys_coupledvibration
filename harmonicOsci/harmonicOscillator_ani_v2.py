@@ -51,7 +51,7 @@ line, = plt.plot([], [], 'ro-', animated=True)
 period_template = '$T$ = %.2f s'
 period_text = ax.text(0.1, 0.8, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
-time_template = 't = %.2f s'
+time_template = '$t$ = %.2f s'
 time_text = ax.text(0.1, 0.9, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 # また、ここでは''としているが、下で time_text.set_textで実際のテキストを入れている
 
