@@ -22,13 +22,13 @@ dt = 0.05                   # [s] interval time
 
 # initial condition
 try:
-    x0 = int(input('initial position (default=5): '))
+    x0 = float(input('initial position (default=5.0): '))
 except ValueError:
-    x0 = 5
+    x0 = 5.0
 try:
-    v0 = int(input('initial velocity (default=0): '))
+    v0 = float(input('initial velocity (default=0.0): '))
 except ValueError:
-    v0 = 0
+    v0 = 0.0
 
 s0 = [x0, v0]               # initial condition
 
@@ -70,7 +70,7 @@ fps = 1000/frame_int        # frames per second
 ani = FuncAnimation(fig, update, frames=f,
                     init_func=init, blit=True, interval=frame_int, repeat=True)
 
-savefile = './gif/harmonicOsci_(x={0},v={1}).gif'.format(x0,v0)
+savefile = './gif/harmonicOsci_(x={0:.1f},v={1:.1f}).gif'.format(x0,v0)
 ani.save(savefile, writer='pillow', fps=fps)
 
 plt.show()
