@@ -17,7 +17,7 @@ m = 20                      # [kg] mass
 l = 20                      # [m] equilibrium length
 afreq = np.sqrt(k/m)        # angular frequency    
 period = 2*np.pi/afreq      # period [s] (T)
-t = 2*period                # [s] duration time
+tmax = 2*period             # [s] duration time
 dt = 0.05                   # [s] interval time
 
 # initial condition
@@ -32,7 +32,7 @@ except ValueError:
 
 s0 = [x0, v0]               # initial condition
 
-t = np.arange(0, t+dt, dt)
+t = np.arange(0, tmax, dt)
 
 sol = odeint(harmonicOscillator, s0, t, args=(k,m))  # ODEの解を求めている
 #print(sol.shape) # (len(t), 2)が出てくる。sol = [[x],[v]]ということ
@@ -48,20 +48,25 @@ ax.set_xlabel('$x$ position [m]')
 line, = plt.plot([], [], 'ro-', animated=True)
 # ここでは[],[]としているが、下でline.set_data([0, l + x[i]], [0, 0])で実際の値を入れている
 
-time_template = 'time = %.1fs'
+period_template = '$T$ = %.2f s'
+period_text = ax.text(0.1, 0.8, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+
+time_template = 't = %.2f s'
 time_text = ax.text(0.1, 0.9, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 # また、ここでは''としているが、下で time_text.set_textで実際のテキストを入れている
 
 def init():                 # FuncAnimationでinit_funcで呼び出す
     time_text.set_text('')
-    return line, time_text
+    period_text.set_text('')
+    return line, time_text, period_text
 
 def update(i):              # ここのiは下のframes=fに対応した引数になっている
     x_pos = [0, l + x[i]]
     y_pos = [0, 0]
     line.set_data(x_pos,y_pos)
     time_text.set_text(time_template % (i*dt))
-    return line, time_text
+    period_text.set_text(period_template % period)
+    return line, time_text, period_text
 
 f = np.arange(0, len(t))
 frame_int = 1000 * dt       # [ms] interval between frames

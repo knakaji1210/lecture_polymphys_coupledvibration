@@ -53,13 +53,17 @@ triangle, = ax.plot([],[], 'b', animated=True)
 mass, = plt.plot([], [], 'ro', markersize='10', animated=True)
 # ここでは[],[]としているが、下で***.set_data([0, l + x[i]], [0, 0])で実際の値を入れている
 
-time_template = 'time = %.1fs'
+period_template = '$T$ = %.2f s'
+period_text = ax.text(0.1, 0.8, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+
+time_template = 'time = %.2f s'
 time_text = ax.text(0.1, 0.9, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 # また、ここでは''としているが、下で time_text.set_textで実際のテキストを入れている
 
 def init():                 # FuncAnimationでinit_funcで呼び出す
     time_text.set_text('')
-    return rod, triangle, mass, time_text
+    period_text.set_text('')
+    return rod, triangle, mass, time_text, period_text
 
 def update(i):              # ここのiは下のframes=fに対応した引数になっている
     x_rod2 = [3*l/4 + x[i], l + x[i]]
@@ -70,7 +74,8 @@ def update(i):              # ここのiは下のframes=fに対応した引数�
     triangle.set_data(x_tri,y_tri)
     mass.set_data(x_mass,y)
     time_text.set_text(time_template % (i*dt))
-    return rod, triangle, mass, time_text
+    period_text.set_text(period_template % period)
+    return rod, triangle, mass, time_text, period_text
 
 '''
 y_triの中の重要部分は
