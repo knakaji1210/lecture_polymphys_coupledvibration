@@ -70,7 +70,7 @@ triangle, = ax.plot([],[], 'b', animated=True)
 mass, = plt.plot([], [], 'ro', markersize='10', animated=True)
 # ここでは[],[]としているが、下で***.set_data([0, l + x[i]], [0, 0])で実際の値を入れている
 
-period_template = r'$\tau$ = {0:.2f} s, $T$ = {1:.2f} s, $c$ = {2} kg/s ({3})'.format(tau,period,c,cond)
+period_template = r'$c$ = {0} kg/s, $\tau$ = {1:.2f} s, $T$ = {2:.2f} s ({3})'.format(c,tau,period,cond)
 period_text = ax.text(0.1, 0.8, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
 time_template = '$t$ = %.2f s'
