@@ -75,7 +75,7 @@ norm1, = plt.plot([], [], 'bo-', animated=True)
 norm2, = plt.plot([], [], 'go-', animated=True)
 # ここでは[],[]としているが、下でlinei.set_dataで実際の値を入れている
 
-var1_template = r'$k_1, k_2$ = {0:.1f}, {1:.1f} N/m'.format(k1,k2)
+var1_template = r'$k, \kappa$ = {0:.1f}, {1:.1f} N/m'.format(k1,k2)
 var1_text = ax.text(0.6, 0.9, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
 var2_template = r'$m$ = {0:.1f} kg'.format(m)
