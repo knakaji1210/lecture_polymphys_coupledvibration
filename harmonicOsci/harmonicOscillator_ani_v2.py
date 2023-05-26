@@ -12,8 +12,14 @@ def harmonicOscillator(s, t, k, m):
     return dsdt
 
 # variables
-k = 100                     # [N/m] spring constant
-m = 20                      # [kg] mass
+try:
+    k = float(input('spring constant [N/m] (default=100.0): '))
+except ValueError:
+    k = 100.0               # [N/m] spring constant
+try:
+    m = float(input('mass [kg] (default=20.0): '))
+except ValueError:
+    m = 20.0                # [kg] mass
 l = 20                      # [m] equilibrium length
 afreq = np.sqrt(k/m)        # angular frequency    
 period = 2*np.pi/afreq      # period [s] (T)
@@ -22,11 +28,11 @@ dt = 0.05                   # [s] interval time
 
 # initial condition
 try:
-    x0 = float(input('initial position (default=5.0): '))
+    x0 = float(input('initial position [m] (default=5.0): '))
 except ValueError:
     x0 = 5.0
 try:
-    v0 = float(input('initial velocity (default=0.0): '))
+    v0 = float(input('initial velocity [m/s] (default=0.0): '))
 except ValueError:
     v0 = 0.0
 
@@ -48,6 +54,9 @@ ax.set_xlabel('$x$ position [m]')
 line, = plt.plot([], [], 'ro-', animated=True)
 # ここでは[],[]としているが、下でline.set_data([0, l + x[i]], [0, 0])で実際の値を入れている
 
+variable_template = r'$k$ = {0:.1f} N/m, $m$ = {1:.1f} kg'.format(k,m)
+variable_text = ax.text(0.6, 0.9, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+
 period_template = '$T$ = %.2f s'
 period_text = ax.text(0.1, 0.8, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
@@ -58,7 +67,8 @@ time_text = ax.text(0.1, 0.9, '', transform=ax.transAxes) # 図形の枠を基�
 def init():                 # FuncAnimationでinit_funcで呼び出す
     time_text.set_text('')
     period_text.set_text('')
-    return line, time_text, period_text
+    variable_text.set_text('')
+    return line, time_text, period_text, variable_text
 
 def update(i):              # ここのiは下のframes=fに対応した引数になっている
     x_pos = [0, l + x[i]]
@@ -66,7 +76,8 @@ def update(i):              # ここのiは下のframes=fに対応した引数�
     line.set_data(x_pos,y_pos)
     time_text.set_text(time_template % (i*dt))
     period_text.set_text(period_template % period)
-    return line, time_text, period_text
+    variable_text.set_text(variable_template)
+    return line, time_text, period_text, variable_text
 
 f = np.arange(0, len(t))
 frame_int = 1000 * dt       # [ms] interval between frames
@@ -75,7 +86,7 @@ fps = 1000/frame_int        # frames per second
 ani = FuncAnimation(fig, update, frames=f,
                     init_func=init, blit=True, interval=frame_int, repeat=True)
 
-savefile = './gif/harmonicOsci_(x={0:.1f},v={1:.1f}).gif'.format(x0,v0)
+savefile = './gif/harmonicOsci_(x={0:.1f},v={1:.1f},k={2:.1f},m={3:.1f}).gif'.format(x0,v0,k,m)
 ani.save(savefile, writer='pillow', fps=fps)
 
 plt.show()
