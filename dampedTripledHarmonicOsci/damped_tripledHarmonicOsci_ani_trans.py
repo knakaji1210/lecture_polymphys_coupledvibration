@@ -29,7 +29,6 @@ L = l1 + l2 + l3 + l4
 n = 3                       # number of mass
 af = [2*np.sqrt(k/m)*np.sin((i+1)*np.pi/(2*(n+1))) for i in range(n)]    # angular frequencies
 peri = [2*np.pi/af[i] for i in range(n)]                                 # periods of af [s] (T)
-tmax = 4*peri[0]             # [s] duration time
 rho = c/(2*m)
 tau = 1/rho
 if rho - af[0] < 0:
