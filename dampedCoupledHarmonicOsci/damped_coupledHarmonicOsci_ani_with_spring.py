@@ -99,10 +99,10 @@ norm1, = plt.plot([], [], 'bo-', markersize='10', animated=True)
 norm2, = plt.plot([], [], 'go-', markersize='10', animated=True)
 # ここでは[],[]としているが、下でlinei.set_dataで実際の値を入れている
 
-damp_template = r'$c$ = {0} kg/s'.format(c)
+damp_template = r'$c$ = {0:.1f} kg/s, $\tau$ = {1:.2f} s'.format(c,tau)
 damp_text = ax.text(0.1, 0.8, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
-peri_template = r'$\tau$ = {0:.2f} s, $T_1$ = {1:.2f} s ({2}), $T_2$ = {3:.2f} s ({4})'.format(tau,peri1,cond1,peri2,cond2)
+peri_template = r'$T_1$ = {0:.2f} s ({1}), $T_2$ = {2:.2f} s ({3})'.format(peri1,cond1,peri2,cond2)
 peri_text = ax.text(0.1, 0.7, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
 time_template = '$t$ = %.2f s'
