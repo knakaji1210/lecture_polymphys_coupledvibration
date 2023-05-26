@@ -14,9 +14,18 @@ def coupledHarmonicOscillator(s, t, k1, k2, m):
     return dsdt
 
 # variables
-k1 = 10                     # [N/m] spring constant
-k2 = 50                     # [N/m] spring constant
-m = 10                      # [kg] mass
+try:
+    k1 = float(input('spring constant 1 [N/m] (default=10.0): '))
+except ValueError:
+    k1 = 10.0               # [N/m] spring constant
+try:
+    k2 = float(input('spring constant 2 [N/m] (default=50.0): '))
+except ValueError:
+    k2 = 50.0               # [N/m] spring constant
+try:
+    m = float(input('mass [kg] (default=10.0): '))
+except ValueError:
+    m = 10.0                # [kg] mass
 l1 = 20                     # [m] equilibrium length
 l2 = 20                     # [m] equilibrium length
 l3 = 20                     # [m] equilibrium length
@@ -30,19 +39,19 @@ dt = 0.05                   # [s] interval time
 
 # initial condition
 try:
-    x1_0 = float(input('initial position of mass1 (default=5.0): '))
+    x1_0 = float(input('initial position of mass1 [m] (default=5.0): '))
 except ValueError:
     x1_0 = 5.0
 try:
-    x2_0 = float(input('initial position of mass2 (default=10.0): '))
+    x2_0 = float(input('initial position of mass2 [m] (default=10.0): '))
 except ValueError:
     x2_0 = 10.0
 try:
-    v1_0 = float(input('initial velocity of mass1 (default=0.0): '))
+    v1_0 = float(input('initial velocity of mass1 [m/s] (default=0.0): '))
 except ValueError:
     v1_0 = 0.0
 try:
-    v2_0 = float(input('initial velocity of mass2 (default=0.0): '))
+    v2_0 = float(input('initial velocity of mass2 [m/s] (default=0.0): '))
 except ValueError:
     v2_0 = 0.0
 
@@ -76,6 +85,12 @@ norm1, = plt.plot([], [], 'bo-', markersize='10', animated=True)
 norm2, = plt.plot([], [], 'go-', markersize='10', animated=True)
 # ここでは[],[]としているが、下でlinei.set_dataで実際の値を入れている
 
+var1_template = r'$k_1, k_2$ = {0:.1f}, {1:.1f} N/m'.format(k1,k2)
+var1_text = ax.text(0.6, 0.9, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+
+var2_template = r'$m$ = {0:.1f} kg'.format(m)
+var2_text = ax.text(0.6, 0.8, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+
 peri_template = '$T_1$ = {0:.2f} s, $T_2$ = {1:.2f} s'.format(peri1,peri2)
 peri_text = ax.text(0.1, 0.8, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
@@ -87,13 +102,17 @@ time_text = ax.text(0.1, 0.9, '', transform=ax.transAxes) # 図形の枠を基�
 def init_w():               # FuncAnimationでinit_funcで呼び出す
     time_text.set_text('')
     peri_text.set_text('')
-    return mass, rod1, rod2, tri1, tri2, tri3, norm1, norm2, time_text, peri_text
+    var1_text.set_text('')
+    var2_text.set_text('')
+    return mass, rod1, rod2, tri1, tri2, tri3, norm1, norm2, time_text, peri_text, var1_text, var2_text
 
 # 基準モード描画なし
 def init_wo():              # FuncAnimationでinit_funcで呼び出す
     time_text.set_text('')
     peri_text.set_text('')
-    return mass, rod1, rod2, tri1, tri2, tri3, time_text, peri_text
+    var1_text.set_text('')
+    var2_text.set_text('')
+    return mass, rod1, rod2, tri1, tri2, tri3, time_text, peri_text, var1_text, var2_text
 
 # 基準モード描画あり
 def update_w(i):             # ここのiは下のframes=np.arange(0, len(t))に対応した引数になっている
@@ -115,7 +134,9 @@ def update_w(i):             # ここのiは下のframes=np.arange(0, len(t))に
     norm2.set_data([0, L/2 + q2[i]], [2, 2])
     time_text.set_text(time_template % (i*dt))
     peri_text.set_text(peri_template)
-    return mass, rod1, rod2, tri1, tri2, tri3, norm1, norm2, time_text, peri_text
+    var1_text.set_text(var1_template)
+    var2_text.set_text(var2_template)
+    return mass, rod1, rod2, tri1, tri2, tri3, norm1, norm2, time_text, peri_text, var1_text, var2_text
 
 '''
 y_triの中の重要部分は
@@ -143,7 +164,9 @@ def update_wo(i):            # ここのiは下のframes=np.arange(0, len(t))に
     mass.set_data([0, l1 + x1[i], l1 + l2 + x2[i], L], [0, 0, 0, 0])
     time_text.set_text(time_template % (i*dt))
     peri_text.set_text(peri_template)
-    return mass, rod1, rod2, tri1, tri2, tri3, time_text, peri_text
+    var1_text.set_text(var1_template)
+    var2_text.set_text(var2_template)
+    return mass, rod1, rod2, tri1, tri2, tri3, time_text, peri_text, var1_text, var2_text
 
 f = np.arange(0, len(t))
 frame_int = 1000 * dt       # [ms] interval between frames
@@ -157,14 +180,14 @@ except:
 if n_mode == "y": # 基準モードを描画する場合
     ani = FuncAnimation(fig, update_w, frames=f,
                     init_func=init_w, blit=True, interval=frame_int, repeat=True)
-    savefile = './gif/coupledHarmonicOsci_wn_wsp_(x1={0:.1f},v1={1:.1f},x2={2:.1f},v2={3:.1f}).gif'.format(x1_0,v1_0,x2_0,v2_0)
+    savefile = './gif/coupledHarmonicOsci_wn_wsp_(x1={0:.1f},v1={1:.1f},x2={2:.1f},v2={3:.1f},k1={4:.1f},k2={5:.1f},m={6:.1f}).gif'.format(x1_0,v1_0,x2_0,v2_0,k1,k2,m)
     ani.save(savefile, writer='pillow', fps=fps)
     plt.show()
 
 elif n_mode == "n": # 基準モードを描画しない場合
     ani = FuncAnimation(fig, update_wo, frames=f,
                     init_func=init_wo, blit=True, interval=frame_int, repeat=True)
-    savefile = './gif/coupledHarmonicOsci_won_wsp_(x1={0:.1f},v1={1:.1f},x2={2:.1f},v2={3:.1f}).gif'.format(x1_0,v1_0,x2_0,v2_0)
+    savefile = './gif/coupledHarmonicOsci_won_wsp_(x1={0:.1f},v1={1:.1f},x2={2:.1f},v2={3:.1f},k1={4:.1f},k2={5:.1f},m={6:.1f}).gif'.format(x1_0,v1_0,x2_0,v2_0,k1,k2,m)
     ani.save(savefile, writer='pillow', fps=fps)
     plt.show()
 else:
