@@ -14,9 +14,18 @@ def dampedCoupledHarmonicOscillator(s, t, k1, k2, m, c):
     return dsdt
 
 # variables
-k1 = 100                    # [N/m] spring constant
-k2 = 200                    # [N/m] spring constant
-m = 20                      # [kg] mass
+try:
+    k1 = float(input('spring constant 1 [N/m] (default=100.0): '))
+except ValueError:
+    k1 = 100.0               # [N/m] spring constant 1
+try:
+    k2 = float(input('spring constant 2 [N/m] (default=200.0): '))
+except ValueError:
+    k2 = 200.0               # [N/m] spring constant 2
+try:
+    m = float(input('mass [kg] (default=20.0): '))
+except ValueError:
+    m = 20.0                # [kg] mass
 try:
     c = float(input('damping coefficient (default=10.0): '))    # [kg/s] damping coefficient
 except ValueError:
@@ -29,26 +38,33 @@ af1_0 = np.sqrt(k1/m)            # natural　angular frequency
 af2_0 = np.sqrt((k1+2*k2)/m)     # natural　angular frequency
 rho = c/(2*m)
 tau = 1/rho
-if rho - af1_0 < 0:
+if np.abs(rho - af1_0) < 0.05: # critical damping (rho == af1_0はほぼ無理)
+    peri1 = tau                # period [s] (T)
+    cond1 = "cd"
+elif rho - af1_0 < 0: # under damping for q1
     af1 = np.sqrt(af1_0**2 - rho**2)
     peri1 = 2*np.pi/af1      # period of af1[s] (T1)
-    cond1 = "underdamped"
-elif rho - af1_0 > 0:
-    af1 = np.sqrt(rho**2 - af1_0**2)
-    peri1 = 2*np.pi/af1      # period of af1[s] (T1)
-    cond1 = "overdamped"
-if rho - af2_0 < 0:
+    cond1 = "ud"
+elif rho - af1_0 > 0: # over damping for q1
+    eta1 = np.sqrt(rho**2 - af1_0**2)
+    peri1 = 1/(rho - eta1)      # period [s] (T)
+    cond1 = "od"
+if np.abs(rho - af2_0) < 0.05: # critical damping (rho == af2_0はほぼ無理)
+    peri2 = tau                # period [s] (T)
+    cond2 = "cd"
+elif rho - af2_0 < 0: # under damping for q2
     af2 = np.sqrt(af2_0**2 - rho**2)
     peri2 = 2*np.pi/af2      # period of af2[s] (T2) 
-    cond2 = "underdamped"
+    cond2 = "ud"
 elif rho - af2_0 > 0:
-    af2 = np.sqrt(rho**2 - af2_0**2)
-    peri2 = 2*np.pi/af2      # period of af2[s] (T2) 
-    cond2 = "overdamped"
-'''
-とりあえずrho = afreq0（臨界減衰）のときは無視
-'''
-tmax = 4*peri1              # [s] duration time
+    eta2 = np.sqrt(rho**2 - af2_0**2)
+    peri2 = 1/(rho - eta2)      # period [s] (T)
+    cond2 = "od"
+
+if cond1 == "cd" or cond2 == "od":
+    tmax = 8*peri1
+else:
+    tmax = 4*np.max([peri1,peri2])              # [s] duration time
 dt = 0.05                   # [s] interval time
 
 # initial condition
@@ -99,29 +115,34 @@ norm1, = plt.plot([], [], 'bo-', markersize='10', animated=True)
 norm2, = plt.plot([], [], 'go-', markersize='10', animated=True)
 # ここでは[],[]としているが、下でlinei.set_dataで実際の値を入れている
 
-damp_template = r'$c$ = {0:.1f} kg/s, $\tau$ = {1:.2f} s'.format(c,tau)
-damp_text = ax.text(0.1, 0.8, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+var1_template = r'$k, \kappa$ = {0:.1f}, {1:.1f} N/m'.format(k1,k2)
+var1_text = ax.text(0.6, 0.92, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
-peri_template = r'$T_1$ = {0:.2f} s ({1}), $T_2$ = {2:.2f} s ({3})'.format(peri1,cond1,peri2,cond2)
-peri_text = ax.text(0.1, 0.7, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+var2_template = r'$m$ = {0:.1f} kg, $c$ = {1:.1f} kg/s'.format(m,c)
+var2_text = ax.text(0.6, 0.85, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+
+peri_template = r'$\tau$ = {0:.2f} s, $T_1$ = {1:.2f} s ({2}), $T_2$ = {3:.2f} s ({4})'.format(tau,peri1,cond1,peri2,cond2)
+peri_text = ax.text(0.1, 0.78, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
 time_template = '$t$ = %.2f s'
-time_text = ax.text(0.1, 0.9, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+time_text = ax.text(0.1, 0.92, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 # また、ここでは''としているが、下で time_text.set_textで実際のテキストを入れている
 
 # 基準モード描画あり
 def init_w():               # FuncAnimationでinit_funcで呼び出す
     time_text.set_text('')
-    damp_text.set_text('')
     peri_text.set_text('')
-    return mass, rod1, rod2, tri1, tri2, tri3, norm1, norm2, time_text, damp_text, peri_text
+    var1_text.set_text('')
+    var2_text.set_text('')
+    return mass, rod1, rod2, tri1, tri2, tri3, norm1, norm2, time_text, peri_text, var1_text, var2_text
 
 # 基準モード描画なし
 def init_wo():              # FuncAnimationでinit_funcで呼び出す
     time_text.set_text('')
-    damp_text.set_text('')
     peri_text.set_text('')
-    return mass, rod1, rod2, tri1, tri2, tri3, time_text, damp_text, peri_text
+    var1_text.set_text('')
+    var2_text.set_text('')
+    return mass, rod1, rod2, tri1, tri2, tri3, time_text, peri_text, var1_text, var2_text
 
 # 基準モード描画あり
 def update_w(i):             # ここのiは下のframes=np.arange(0, len(t))に対応した引数になっている
@@ -142,9 +163,10 @@ def update_w(i):             # ここのiは下のframes=np.arange(0, len(t))に
     norm1.set_data([0, L/2 + q1[i]], [1, 1])    # L/2を中心に描画
     norm2.set_data([0, L/2 + q2[i]], [2, 2])
     time_text.set_text(time_template % (i*dt))
-    damp_text.set_text(damp_template)
     peri_text.set_text(peri_template)
-    return mass, rod1, rod2, tri1, tri2, tri3, norm1, norm2, time_text, damp_text, peri_text
+    var1_text.set_text(var1_template)
+    var2_text.set_text(var2_template)
+    return mass, rod1, rod2, tri1, tri2, tri3, norm1, norm2, time_text, peri_text, var1_text, var2_text
 
 '''
 y_triの中の重要部分は
@@ -171,9 +193,10 @@ def update_wo(i):            # ここのiは下のframes=np.arange(0, len(t))に
     tri3.set_data(x_tri3,y_tri3)
     mass.set_data([0, l1 + x1[i], l1 + l2 + x2[i], L], [0, 0, 0, 0])
     time_text.set_text(time_template % (i*dt))
-    damp_text.set_text(damp_template)
     peri_text.set_text(peri_template)
-    return mass, rod1, rod2, tri1, tri2, tri3, time_text, damp_text, peri_text
+    var1_text.set_text(var1_template)
+    var2_text.set_text(var2_template)
+    return mass, rod1, rod2, tri1, tri2, tri3, time_text, peri_text, var1_text, var2_text
 
 f = np.arange(0, len(t))
 frame_int = 1000 * dt       # [ms] interval between frames
@@ -187,14 +210,14 @@ except:
 if n_mode == "y": # 基準モードを描画する場合
     ani = FuncAnimation(fig, update_w, frames=f,
                     init_func=init_w, blit=True, interval=frame_int, repeat=True)
-    savefile = './gif/coupledHarmonicOsci_wn_wsp_(x1={0:.1f},v1={1:.1f},x2={2:.1f},v2={3:.1f},c={4:.1f}).gif'.format(x1_0,v1_0,x2_0,v2_0,c)
+    savefile = './gif/coupledHarmonicOsci_wn_wsp_(x1={0:.1f},x2={1:.1f},k1={2:.1f},k2={3:.1f},m={4:.1f}c={5:.1f}).gif'.format(x1_0,x2_0,k1,k2,m,c)
     ani.save(savefile, writer='pillow', fps=fps)
     plt.show()
 
 elif n_mode == "n": # 基準モードを描画しない場合
     ani = FuncAnimation(fig, update_wo, frames=f,
                     init_func=init_wo, blit=True, interval=frame_int, repeat=True)
-    savefile = './gif/coupledHarmonicOsci_won_wsp_(x1={0:.1f},v1={1:.1f},x2={2:.1f},v2={3:.1f},c={4:.1f}).gif'.format(x1_0,v1_0,x2_0,v2_0,c)
+    savefile = './gif/damped_coupledHarmonicOsci_won_wsp_(x1={0:.1f},x2={1:.1f},k1={2:.1f},k2={3:.1f},m={4:.1f}c={5:.1f}).gif'.format(x1_0,x2_0,k1,k2,m,c)
     ani.save(savefile, writer='pillow', fps=fps)
     plt.show()
 else:
