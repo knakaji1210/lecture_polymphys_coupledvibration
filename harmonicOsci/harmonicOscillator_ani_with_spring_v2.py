@@ -13,9 +13,9 @@ def harmonicOscillator(s, t, k, m):
 
 # variables
 try:
-    k = float(input('spring constant [N/m] (default=20.0): '))
+    k = float(input('spring constant [N/m] (default=10.0): '))
 except ValueError:
-    k = 20.0               # [N/m] spring constant
+    k = 10.0               # [N/m] spring constant
 try:
     m = float(input('mass [kg] (default=1.0): '))
 except ValueError:
