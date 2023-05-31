@@ -13,13 +13,13 @@ def harmonicOscillator(s, t, k, m):
 
 # variables
 try:
-    k = float(input('spring constant [N/m] (default=100.0): '))
+    k = float(input('spring constant [N/m] (default=20.0): '))
 except ValueError:
-    k = 100.0               # [N/m] spring constant
+    k = 20.0               # [N/m] spring constant
 try:
-    m = float(input('mass [kg] (default=20.0): '))
+    m = float(input('mass [kg] (default=1.0): '))
 except ValueError:
-    m = 20.0                # [kg] mass
+    m = 1.0                # [kg] mass
 l = 20                      # [m] equilibrium length
 afreq = np.sqrt(k/m)        # angular frequency    
 period = 2*np.pi/afreq      # period [s] (T)
@@ -50,6 +50,10 @@ ax = fig.add_subplot(111, xlim=(-5, 50), ylim=(-5, 5))
 ax.grid()
 ax.set_axisbelow(True)
 ax.set_xlabel('$x$ position [m]')
+var_template = r'$k$ = {0:.1f} N/m, $m$ = {1:.1f} kg'.format(k,m)
+ax.text(0.6, 0.9, var_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+period_template = r'$T$ = {0:.2f} s'.format(period)
+ax.text(0.1, 0.8, period_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 x_rod1 = [0, l/4]
 y = [0, 0]
 ax.plot(x_rod1,y, c='b')
@@ -59,21 +63,13 @@ triangle, = ax.plot([],[], 'b', animated=True)
 mass, = plt.plot([], [], 'ro', markersize='10', animated=True)
 # ここでは[],[]としているが、下で***.set_data([0, l + x[i]], [0, 0])で実際の値を入れている
 
-var_template = r'$k$ = {0:.1f} N/m, $m$ = {1:.1f} kg'.format(k,m)
-var_text = ax.text(0.6, 0.9, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-
-period_template = '$T$ = %.2f s'
-period_text = ax.text(0.1, 0.8, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-
 time_template = '$t$ = %.2f s'
 time_text = ax.text(0.1, 0.9, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 # また、ここでは''としているが、下で time_text.set_textで実際のテキストを入れている
 
 def init():                 # FuncAnimationでinit_funcで呼び出す
     time_text.set_text('')
-    period_text.set_text('')
-    var_text.set_text('')
-    return rod, triangle, mass, time_text, period_text, var_text
+    return rod, triangle, mass, time_text
 
 def update(i):              # ここのiは下のframes=fに対応した引数になっている
     x_rod2 = [3*l/4 + x[i], l + x[i]]
@@ -84,9 +80,7 @@ def update(i):              # ここのiは下のframes=fに対応した引数�
     triangle.set_data(x_tri,y_tri)
     mass.set_data(x_mass,y)
     time_text.set_text(time_template % (i*dt))
-    period_text.set_text(period_template % period)
-    var_text.set_text(var_template)
-    return rod, triangle, mass, time_text, period_text, var_text
+    return rod, triangle, mass, time_text
 
 '''
 y_triの中の重要部分は
