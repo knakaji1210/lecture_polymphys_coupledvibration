@@ -16,17 +16,17 @@ def dampedTripledHarmonicOscillator(s, t, k, m, c):
 
 # variables
 try:
-    k = float(input('spring constant [N/m] (default=100.0): '))
+    k = float(input('spring constant [N/m] (default=10.0): '))
 except ValueError:
-    k = 100.0               # [N/m] spring constant 2
+    k = 10.0               # [N/m] spring constant 2
 try:
-    m = float(input('mass [kg] (default=20.0): '))
+    m = float(input('mass [kg] (default=1.0): '))
 except ValueError:
-    m = 20.0                # [kg] mass
+    m = 1.0                # [kg] mass
 try:
-    c = float(input('damping coefficient (default=10.0): '))    # [kg/s] damping coefficient
+    c = float(input('damping coefficient [kg/s] (default=0.5): '))    # [kg/s] damping coefficient
 except ValueError:
-    c = 10.0
+    c = 0.5                 # [m/s] damping coefficient
 l1 = 20                     # [m] equilibrium length
 l2 = 20                     # [m] equilibrium length
 l3 = 20                     # [m] equilibrium length
@@ -119,6 +119,10 @@ ax = fig.add_subplot(111, xlim=(0, L), ylim=(-L/4, 1.4*L))
 ax.grid()
 ax.set_axisbelow(True)
 ax.set_xlabel('$x$ position [m]')
+var_template = r'$k$ = {0:.1f} N/m, $m$ = {1:.1f} kg, $c$ = {2:.1f} kg/s'.format(k,m,c)
+ax.text(0.4, 0.92, var_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+peri_template = r'$\tau$ = {0:.2f} s, $T_1$ = {1:.2f} s ({2}), $T_2$ = {3:.2f} s ({4}), $T_3$ = {5:.2f} s ({6})'.format(tau,peri1,cond1,peri2,cond2,peri3,cond3)
+ax.text(0.1, 0.78, peri_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
 line, = plt.plot([], [], 'ro-', animated=True)
 norm1, = plt.plot([], [], 'bo-', animated=True)
@@ -126,21 +130,13 @@ norm2, = plt.plot([], [], 'go-', animated=True)
 norm3, = plt.plot([], [], 'yo-', animated=True)
 # ここでは[],[]としているが、下でlinei.set_dataで実際の値を入れている
 
-var_template = r'$k$ = {0:.1f} N/m, $m$ = {1:.1f} kg, $c$ = {2:.1f} kg/s'.format(k,m,c)
-var_text = ax.text(0.4, 0.92, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-
-peri_template = r'$\tau$ = {0:.2f} s, $T_1$ = {1:.2f} s ({2}), $T_2$ = {3:.2f} s ({4}), $T_3$ = {5:.2f} s ({6})'.format(tau,peri1,cond1,peri2,cond2,peri3,cond3)
-peri_text = ax.text(0.1, 0.78, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-
 time_template = '$t$ = %.2f s'
 time_text = ax.text(0.1, 0.92, '', transform=ax.transAxes)
 # また、ここでは''としているが、下で time_text.set_textで実際のテキストを入れている
 
 def init():               # FuncAnimationでinit_funcで呼び出す
     time_text.set_text('')
-    peri_text.set_text('')
-    var_text.set_text('')
-    return line, norm1, norm2, norm3, time_text, peri_text, var_text
+    return line, norm1, norm2, norm3, time_text
 
 def update(i):              # ここのiは下のframes=np.arange(0, len(t))に対応した引数になっている
     line.set_data([0, l1, l1 + l2, l1 + l2 + l3, L], [0, x1[i], x2[i], x3[i], 0])
@@ -148,9 +144,7 @@ def update(i):              # ここのiは下のframes=np.arange(0, len(t))に�
     norm2.set_data([0, L/2 + q2[i]], [2*l1, 2*l1])
     norm3.set_data([0, L/2 + q3[i]], [3*l1, 3*l1])
     time_text.set_text(time_template % (i*dt))
-    peri_text.set_text(peri_template)
-    var_text.set_text(var_template)
-    return line, norm1, norm2, norm3, time_text, peri_text, var_text
+    return line, norm1, norm2, norm3, time_text
 
 f = np.arange(0, len(t))
 frame_int = 1000 * dt       # [ms] interval between frames
