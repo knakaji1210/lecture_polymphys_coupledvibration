@@ -25,13 +25,13 @@ def ladderVibration(s, t, k, m):
 
 # variables
 try:
-    k = float(input('spring constant [N/m] (default=60.0): '))
+    k = float(input('spring constant [N/m] (default=10.0): '))
 except ValueError:
-    k = 60.0                # [N/m] spring constant
+    k = 10.0                # [N/m] spring constant
 try:
-    m = float(input('mass [kg] (default=10.0): '))
+    m = float(input('mass [kg] (default=1.0): '))
 except ValueError:
-    m = 10.0                # [kg] mass
+    m = 1.0                # [kg] mass
 l = 10                      # [m] equilibrium length for each component
 n = 9                       # number of mass
 pos = [i*l for i in range(n+2)]
@@ -56,10 +56,10 @@ if ini == "s":
 elif ini == "m":
     x_ini = [amp*np.sin(np.pi*(i+1)/(n+1)) + amp*np.sin(3*np.pi*(i+1)/(n+1)) + amp*np.sin(5*np.pi*(i+1)/(n+1)) for i in range(n)]     # [m]   initial position
 elif ini == "d":
-    x_ini = [2*amp]+np.zeros(n).tolist()     # [m]   initial position
+    x_ini = [2*amp]+np.zeros(n).tolist()    # [m]   initial position
 else:
-    x_ini = np.zeros(n+1).tolist()     # [m]   initial position
-v_ini = np.zeros(n)                                             # [m/s]   initial velocity
+    x_ini = np.zeros(n+1).tolist()          # [m]   initial position
+v_ini = np.zeros(n)                         # [m/s]   initial velocity
 xv_ini = [[x,v] for (x,v) in zip(x_ini,v_ini)]
 s0 = [x for component in xv_ini for x in component]
 
@@ -81,6 +81,10 @@ ax = fig.add_subplot(111, xlim=(0, L), ylim=(-L/5, 0.6*L))
 ax.grid()
 ax.set_axisbelow(True)
 ax.set_xlabel('$x$ position [m]')
+var_template = r'$k$ = {0:.1f} N/m, $m$ = {1:.1f} kg'.format(k,m)
+ax.text(0.6, 0.92, var_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+peri_template = '$T_1$ = {0:.2f} s, $T_2$ = {1:.2f} s, $T_3$ = {2:.2f} s, $T_{4}$ = {3:.2f} s'.format(peri[0],peri[1],peri[2],peri[mode2show-1],mode2show)
+ax.text(0.1, 0.82, peri_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
 line, = plt.plot([], [], 'ro-', animated=True)
 norm1, = plt.plot([], [], 'bo-', animated=True)
@@ -89,20 +93,12 @@ norm3, = plt.plot([], [], 'yo-', animated=True)
 norm, = plt.plot([], [], 'co-', animated=True)
 # ここでは[],[]としているが、下でline.set_dataなどで実際の値を入れている
 
-var_template = r'$k$ = {0:.1f} N/m, $m$ = {1:.1f} kg'.format(k,m)
-var_text = ax.text(0.6, 0.92, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-
-peri_template = '$T_1$ = {0:.2f} s, $T_2$ = {1:.2f} s, $T_3$ = {2:.2f} s, $T_{4}$ = {3:.2f} s'.format(peri[0],peri[1],peri[2],peri[mode2show-1],mode2show)
-peri_text = ax.text(0.1, 0.82, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-
 time_template = '$t$ = %.2f s'
 time_text = ax.text(0.1, 0.92, '', transform=ax.transAxes)
 
 def init():
     time_text.set_text('')
-    peri_text.set_text('')
-    var_text.set_text('')
-    return line, norm1, norm2, norm3, norm, time_text, peri_text, var_text
+    return line, norm1, norm2, norm3, norm, time_text
 
 def update(i):              # ここのiは下のframes=np.arange(0, len(t))に対応した引数になっている
     line.set_data(pos, 
@@ -112,9 +108,7 @@ def update(i):              # ここのiは下のframes=np.arange(0, len(t))に�
     norm3.set_data([0, L/2 + q3[i]], [30, 30])
     norm.set_data([0, L/2 + qn[i]], [40, 40])
     time_text.set_text(time_template % (i*dt))
-    peri_text.set_text(peri_template)
-    var_text.set_text(var_template)
-    return line, norm1, norm2, norm3, norm, time_text, peri_text, var_text
+    return line, norm1, norm2, norm3, norm, time_text
 
 f = np.arange(0, len(t))
 frame_int = 1000 * dt       # [ms] interval between frames
