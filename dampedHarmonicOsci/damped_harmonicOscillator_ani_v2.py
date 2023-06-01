@@ -15,15 +15,15 @@ def dampedHarmonicOscillator(s, t, k, m, c):
 try:
     k = float(input('spring constant [N/m] (default=10.0): '))
 except ValueError:
-    k = 10.0               # [N/m] spring constant
+    k = 10.0                # [N/m] spring constant
 try:
     m = float(input('mass [kg] (default=1.0): '))
 except ValueError:
-    m = 1.0                # [kg] mass
+    m = 1.0                 # [kg] mass
 try:
     c = float(input('damping coefficient [kg/s] (default=0.5): '))    # [kg/s] damping coefficient
 except ValueError:
-    c = 0.5
+    c = 0.5                 # [m/s] damping coefficient
 l = 20                      # [m] equilibrium length
 afreq0 = np.sqrt(k/m)       # natural　angular frequency
 rho = c/(2*m)
