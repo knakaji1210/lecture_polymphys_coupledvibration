@@ -19,13 +19,13 @@ try:
 except ValueError:
     k1 = 10.0               # [N/m] spring constant
 try:
-    k2 = float(input('spring constant 2 [N/m] (default=50.0): '))
+    k2 = float(input('spring constant 2 [N/m] (default=20.0): '))
 except ValueError:
-    k2 = 50.0               # [N/m] spring constant
+    k2 = 20.0               # [N/m] spring constant
 try:
-    m = float(input('mass [kg] (default=10.0): '))
+    m = float(input('mass [kg] (default=1.0): '))
 except ValueError:
-    m = 10.0                # [kg] mass
+    m = 1.0                # [kg] mass
 l1 = 20                     # [m] equilibrium length
 l2 = 20                     # [m] equilibrium length
 l3 = 20                     # [m] equilibrium length
@@ -70,6 +70,12 @@ ax = fig.add_subplot(111, xlim=(0, L), ylim=(-1, 3))
 ax.grid()
 ax.set_axisbelow(True)
 ax.set_xlabel('$x$ position [m]')
+var1_template = r'$k, \kappa$ = {0:.1f}, {1:.1f} N/m'.format(k1,k2)
+ax.text(0.6, 0.9, var1_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+var2_template = r'$m$ = {0:.1f} kg'.format(m)
+ax.text(0.6, 0.8, var2_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+peri_template = '$T_1$ = {0:.2f} s, $T_2$ = {1:.2f} s'.format(peri1,peri2)
+ax.text(0.1, 0.8, peri_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 x_rod_l, x_rod_r = [0, l1/4], [L-l3/4, L]   # 両端のロッド
 y = [0, 0]
 ax.plot(x_rod_l,y, c='b')
@@ -85,15 +91,6 @@ norm1, = plt.plot([], [], 'bo-', markersize='10', animated=True)
 norm2, = plt.plot([], [], 'go-', markersize='10', animated=True)
 # ここでは[],[]としているが、下でlinei.set_dataで実際の値を入れている
 
-var1_template = r'$k, \kappa$ = {0:.1f}, {1:.1f} N/m'.format(k1,k2)
-var1_text = ax.text(0.6, 0.9, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-
-var2_template = r'$m$ = {0:.1f} kg'.format(m)
-var2_text = ax.text(0.6, 0.8, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-
-peri_template = '$T_1$ = {0:.2f} s, $T_2$ = {1:.2f} s'.format(peri1,peri2)
-peri_text = ax.text(0.1, 0.8, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-
 time_template = '$t$ = %.2f s'
 time_text = ax.text(0.1, 0.9, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 # また、ここでは''としているが、下で time_text.set_textで実際のテキストを入れている
@@ -101,18 +98,12 @@ time_text = ax.text(0.1, 0.9, '', transform=ax.transAxes) # 図形の枠を基�
 # 基準モード描画あり
 def init_w():               # FuncAnimationでinit_funcで呼び出す
     time_text.set_text('')
-    peri_text.set_text('')
-    var1_text.set_text('')
-    var2_text.set_text('')
-    return mass, rod1, rod2, tri1, tri2, tri3, norm1, norm2, time_text, peri_text, var1_text, var2_text
+    return mass, rod1, rod2, tri1, tri2, tri3, norm1, norm2, time_text
 
 # 基準モード描画なし
 def init_wo():              # FuncAnimationでinit_funcで呼び出す
     time_text.set_text('')
-    peri_text.set_text('')
-    var1_text.set_text('')
-    var2_text.set_text('')
-    return mass, rod1, rod2, tri1, tri2, tri3, time_text, peri_text, var1_text, var2_text
+    return mass, rod1, rod2, tri1, tri2, tri3, time_text
 
 # 基準モード描画あり
 def update_w(i):             # ここのiは下のframes=np.arange(0, len(t))に対応した引数になっている
@@ -133,10 +124,7 @@ def update_w(i):             # ここのiは下のframes=np.arange(0, len(t))に
     norm1.set_data([0, L/2 + q1[i]], [1, 1])    # L/2を中心に描画
     norm2.set_data([0, L/2 + q2[i]], [2, 2])
     time_text.set_text(time_template % (i*dt))
-    peri_text.set_text(peri_template)
-    var1_text.set_text(var1_template)
-    var2_text.set_text(var2_template)
-    return mass, rod1, rod2, tri1, tri2, tri3, norm1, norm2, time_text, peri_text, var1_text, var2_text
+    return mass, rod1, rod2, tri1, tri2, tri3, norm1, norm2, time_text
 
 '''
 y_triの中の重要部分は
@@ -163,10 +151,7 @@ def update_wo(i):            # ここのiは下のframes=np.arange(0, len(t))に
     tri3.set_data(x_tri3,y_tri3)
     mass.set_data([0, l1 + x1[i], l1 + l2 + x2[i], L], [0, 0, 0, 0])
     time_text.set_text(time_template % (i*dt))
-    peri_text.set_text(peri_template)
-    var1_text.set_text(var1_template)
-    var2_text.set_text(var2_template)
-    return mass, rod1, rod2, tri1, tri2, tri3, time_text, peri_text, var1_text, var2_text
+    return mass, rod1, rod2, tri1, tri2, tri3, time_text
 
 f = np.arange(0, len(t))
 frame_int = 1000 * dt       # [ms] interval between frames
