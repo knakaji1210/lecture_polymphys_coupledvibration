@@ -25,22 +25,22 @@ def dampedLadderVibration(s, t, k, m, c):
 
 # variables
 try:
-    k = float(input('spring constant [N/m] (default=100.0): '))
+    k = float(input('spring constant [N/m] (default=10.0): '))
 except ValueError:
-    k = 100.0                # [N/m] spring constant
+    k = 10.0                # [N/m] spring constant
 try:
-    m = float(input('mass (default=20.0): '))    # [kg] mass
+    m = float(input('mass [kg] (default=1.0): '))    # [kg] mass
 except ValueError:
-    m = 20.0
+    m = 1.0
 try:
-    c = float(input('damping coefficient (default=10.0): '))    # [kg/s] damping coefficient
+    c = float(input('damping coefficient [kg/s] (default=0.5): '))    # [kg/s] damping coefficient
 except ValueError:
-    c = 10.0
+    c = 0.5                 # [m/s] damping coefficient
 l = 10                      # [m] equilibrium length for each component
 n = 9                       # number of mass
 pos = [i*l for i in range(n+2)]
 L = pos[-1]                 # [m] total length
-af = [2*np.sqrt(k/m)*np.sin((i+1)*np.pi/(2*(n+1))) for i in range(n)]    # angular frequencies                            # periods of af [s] (T)
+af = [2*np.sqrt(k/m)*np.sin((i+1)*np.pi/(2*(n+1))) for i in range(n)]    # angular frequencies
 rho = c/(2*m)
 tau = 1/rho
 try:
@@ -135,6 +135,12 @@ ax = fig.add_subplot(111, xlim=(0, L), ylim=(-L/5, 0.7*L))
 ax.grid()
 ax.set_axisbelow(True)
 ax.set_xlabel('$x$ position [m]')
+var_template = r'$k$ = {0:.1f} N/m, $m$ = {1:.1f} kg, $c$ = {2:.1f} kg/s'.format(k,m,c)
+ax.text(0.4, 0.92, var_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+peri1_template = r'$\tau$ = {0:.2f} s, $T_1$ = {1:.2f} s ({2}), $T_2$ = {3:.2f} s ({4})'.format(tau,peri1,cond1,peri2,cond2)
+ax.text(0.1, 0.85, peri1_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+peri2_template = r'$T_3$ = {0:.2f} s ({1}), $T_{2}$ = {3:.2f} s ({4})'.format(peri3,cond3,mode2show,perin,condn)
+ax.text(0.25, 0.78, peri2_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
 line, = plt.plot([], [], 'ro-', animated=True)
 norm1, = plt.plot([], [], 'bo-', animated=True)
@@ -143,24 +149,12 @@ norm3, = plt.plot([], [], 'yo-', animated=True)
 norm, = plt.plot([], [], 'co-', animated=True)
 # ここでは[],[]としているが、下でline.set_dataなどで実際の値を入れている
 
-var_template = r'$k$ = {0:.1f} N/m, $m$ = {1:.1f} kg, $c$ = {2:.1f} kg/s'.format(k,m,c)
-var_text = ax.text(0.4, 0.92, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-
-peri1_template = r'$\tau$ = {0:.2f} s, $T_1$ = {1:.2f} s ({2}), $T_2$ = {3:.2f} s ({4})'.format(tau,peri1,cond1,peri2,cond2)
-peri1_text = ax.text(0.1, 0.85, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-
-peri2_template = r'$T_3$ = {0:.2f} s ({1}), $T_{2}$ = {3:.2f} s ({4})'.format(peri3,cond3,mode2show,perin,condn)
-peri2_text = ax.text(0.1, 0.78, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-
 time_template = '$t$ = %.2f s'
 time_text = ax.text(0.1, 0.92, '', transform=ax.transAxes)
 
 def init():
     time_text.set_text('')
-    peri1_text.set_text('')
-    peri2_text.set_text('')
-    var_text.set_text('')
-    return line, norm1, norm2, norm3, norm, time_text, peri1_text, peri2_text, var_text
+    return line, norm1, norm2, norm3, norm, time_text
 
 def update(i):              # ここのiは下のframes=np.arange(0, len(t))に対応した引数になっている
     line.set_data(pos, 
@@ -170,10 +164,7 @@ def update(i):              # ここのiは下のframes=np.arange(0, len(t))に�
     norm3.set_data([0, L/2 + q3[i]], [30, 30])
     norm.set_data([0, L/2 + qn[i]], [40, 40])
     time_text.set_text(time_template % (i*dt))
-    peri1_text.set_text(peri1_template)
-    peri2_text.set_text(peri2_template)
-    var_text.set_text(var_template)
-    return line, norm1, norm2, norm3, norm, time_text, peri1_text, peri2_text, var_text
+    return line, norm1, norm2, norm3, norm, time_text
 
 f = np.arange(0, len(t))
 frame_int = 1000 * dt       # [ms] interval between frames
