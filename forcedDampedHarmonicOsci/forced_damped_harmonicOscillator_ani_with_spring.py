@@ -13,17 +13,17 @@ def forcedHarmonicOscillator(s, t, k, m, c, Fa, af):
 
 # variables
 try:
-    k = float(input('spring constant [N/m] (default=20.0): '))
+    k = float(input('spring constant [N/m] (default=10.0): '))
 except ValueError:
-    k = 20.0               # [N/m] spring constant
+    k = 10.0               # [N/m] spring constant
 try:
     m = float(input('mass [kg] (default=1.0): '))
 except ValueError:
     m = 1.0                # [kg] mass
 try:
-    c = float(input('damping coefficient [kg/s] (default=1.0): '))    # [kg/s] damping coefficient
+    c = float(input('damping coefficient [kg/s] (default=0.5): '))    # [kg/s] damping coefficient
 except ValueError:
-    c = 1.0
+    c = 0.5
 l = 20                      # [m] equilibrium length
 afreq0 = np.sqrt(k/m)       # natural　angular frequency
 rho = c/(2*m)
@@ -78,18 +78,16 @@ ax.text(0.7, 0.5, amp_o_template, transform=ax.transAxes)
 x_rod1 = [0, l/4]
 y = [0, 0]
 ax.plot(x_rod1,y, c='b')
+var_template = r'$k$ = {0:.1f} N/m, $m$ = {1:.1f} kg, $c$ = {2:.1f} kg/s'.format(k,m,c)
+ax.text(0.4, 0.9, var_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+period_template = r'$\tau$ = {0:.2f} s, $\omega_r$ = {1:.2f} s$^{{-1}}$ ({2}), $\omega_f$ = {3:.2f} s$^{{-1}}$'.format(tau,afreq,cond,af)
+ax.text(0.1, 0.8, period_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
 input, = plt.plot([], [], 'go-', animated=True)
 rod, = ax.plot([],[], 'b', animated=True)
 triangle, = ax.plot([],[], 'b', animated=True)
 mass, = plt.plot([], [], 'ro', markersize='10', animated=True)
 # ここでは[],[]としているが、下で***.set_data([0, l + x[i]], [0, 0])で実際の値を入れている
-
-var_template = r'$k$ = {0:.1f} N/m, $m$ = {1:.1f} kg, $c$ = {2:.1f} kg/s'.format(k,m,c)
-ax.text(0.4, 0.9, var_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-
-period_template = r'$\tau$ = {0:.2f} s, $\omega_r$ = {1:.2f} s$^{{-1}}$ ({2}), $\omega_f$ = {3:.2f} s$^{{-1}}$'.format(tau,afreq,cond,af)
-ax.text(0.1, 0.8, period_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
 time_template = '$t$ = %.2f s'
 time_text = ax.text(0.1, 0.9, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
