@@ -13,17 +13,17 @@ def dampedHarmonicOscillator(s, t, k, m, c):
 
 # variables
 try:
-    k = float(input('spring constant [N/m] (default=100.0): '))
+    k = float(input('spring constant [N/m] (default=10.0): '))
 except ValueError:
-    k = 100.0               # [N/m] spring constant
+    k = 10.0               # [N/m] spring constant
 try:
-    m = float(input('mass [kg] (default=20.0): '))
+    m = float(input('mass [kg] (default=1.0): '))
 except ValueError:
-    m = 20.0                # [kg] mass
+    m = 1.0                # [kg] mass
 try:
-    c = float(input('damping coefficient (default=10.0): '))    # [kg/s] damping coefficient
+    c = float(input('damping coefficient [kg/s] (default=0.5): '))    # [kg/s] damping coefficient
 except ValueError:
-    c = 10.0
+    c = 0.5
 l = 20                      # [m] equilibrium length
 afreq0 = np.sqrt(k/m)       # natural　angular frequency
 rho = c/(2*m)
@@ -40,16 +40,16 @@ elif rho - afreq0 > 0: # over damping
     period = 1/(rho - eta)      # period [s] (T)
     cond = "od"
 
-tmax = 4*period             # [s] duration time
+tmax = 6*period             # [s] duration time
 dt = 0.05                   # [s] interval time
 
 # initial condition
 try:
-    x0 = float(input('initial position (default=5.0): '))
+    x0 = float(input('initial position [m] (default=5.0): '))
 except ValueError:
     x0 = 5.0
 try:
-    v0 = float(input('initial velocity (default=0.0): '))
+    v0 = float(input('initial velocity [m/s] (default=0.0): '))
 except ValueError:
     v0 = 0.0
 
@@ -65,15 +65,13 @@ ax = fig.add_subplot(111, xlim=(-5, 50), ylim=(-5, 5))
 ax.grid()
 ax.set_axisbelow(True)
 ax.set_xlabel('$x$ position [m]')
+var_template = r'$k$ = {0:.1f} N/m, $m$ = {1:.1f} kg, $c$ = {2:.1f} kg/s'.format(k,m,c)
+ax.text(0.4, 0.9, var_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+period_template = r'$\tau$ = {0:.2f} s, $T$ = {1:.2f} s ({2})'.format(tau,period,cond)
+ax.text(0.1, 0.8, period_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
 line, = plt.plot([], [], 'ro-', animated=True)
 # ここでは[],[]としているが、下でline.set_data([0, l + x[i]], [0, 0])で実際の値を入れている
-
-var_template = r'$k$ = {0:.1f} N/m, $m$ = {1:.1f} kg, $c$ = {2:.1f} kg/s'.format(k,m,c)
-var_text = ax.text(0.4, 0.9, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-
-period_template = r'$\tau$ = {0:.2f} s, $T$ = {1:.2f} s ({2})'.format(tau,period,cond)
-period_text = ax.text(0.1, 0.8, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
 time_template = '$t$ = %.1f s'
 time_text = ax.text(0.1, 0.9, '', transform=ax.transAxes)
@@ -81,18 +79,14 @@ time_text = ax.text(0.1, 0.9, '', transform=ax.transAxes)
 
 def init():                 # FuncAnimationでinit_funcで呼び出す
     time_text.set_text('')
-    period_text.set_text('')
-    var_text.set_text('')
-    return line, time_text, period_text, var_text
+    return line, time_text
 
 def update(i):              # ここのiは下のframes=np.arange(0, len(t))に対応した引数になっている
     x_pos = [0, l + x[i]]
     y_pos = [0, 0]
     line.set_data(x_pos,y_pos)
     time_text.set_text(time_template % (i*dt))
-    period_text.set_text(period_template)
-    var_text.set_text(var_template)
-    return line, time_text, period_text, var_text
+    return line, time_text
 
 f = np.arange(0, len(t))
 frame_int = 1000 * dt       # [ms] interval between frames
