@@ -35,14 +35,14 @@ tau = 1/rho
 print('check "rho = {0:.1f} 1/s < af = {1:.1f} 1/s"'.format(rho,afreq0))
 if np.abs(rho - afreq0) < 0.05: # critical damping (rho == afreq0はほぼ無理)
     pass
-elif rho - afreq0 > 0:      # over damping
+elif rho - afreq0 > 0: # over damping
     pass
-elif rho - afreq0 < 0:      # under damping
+elif rho - afreq0 < 0: # under damping
     afreq = np.sqrt(afreq0**2 - rho**2)
-    period = 2*np.pi/afreq  # period [s] (T)
+    period = 2*np.pi/afreq      # period [s] (T)
 
-tmax = 10*period            # [s] duration time
-dt = 0.01                   # [s] interval time
+tmax = 10*period             # [s] duration time
+dt = 0.05                   # [s] interval time
 
 # forced oscillation
 try:
@@ -58,9 +58,9 @@ try:
 except ValueError:
     af_max = 5.0
 try:
-    num_freq = int(input('number of anglar frequency (default=100): '))
+    num_freq = int(input('number of anglar frequency (default=5): '))
 except ValueError:
-    num_freq = 100
+    num_freq = 5
 
 af_list = np.linspace(af_min, af_max, num_freq)
 
@@ -70,6 +70,8 @@ v0 = 0.0
 s0 = [x0, v0]               # initial condition
 
 t = np.arange(0, tmax, dt)
+i_ani = len(af_list)*len(t)
+t_ani = np.arange(0, len(af_list)*len(t)*dt, dt)
 
 xi = []             # 周波数掃引の全ての入力信号を格納
 xo = []             # 周波数掃引の全ての出力信号を格納
@@ -103,33 +105,75 @@ for af in af_list:
 xamp_max = np.max(xamp)
 
 fig = plt.figure()
-ax1 = fig.add_subplot(111, xlim=(af_min, af_max), ylim=(0, 1.2*xamp_max))
-ax1.set_axisbelow(True)
-ax1.set_xlabel('$\omega_f$ /s$^{{-1}}$')
-ax1.set_ylabel(r'$A_{{out}}$ /m')
-
-var1_template = r'$k$ = {0:.1f} N/m'.format(k)
-var2_template = r'$m$ = {0:.1f} kg'.format(m)
-var3_template = r'$c$ = {0:.1f} kg/s'.format(c)
-ax1.text(0.1, 0.95, var1_template, transform=ax1.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-ax1.text(0.1, 0.85, var2_template, transform=ax1.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-ax1.text(0.1, 0.75, var3_template, transform=ax1.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-peri1_template = r'$\tau$ = {0:.2f} s'.format(tau)
-peri2_template = r'$\omega_r$ = {0:.2f} s$^{{-1}}$'.format(afreq)
-ax1.text(0.1, 0.65, peri1_template, transform=ax1.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-ax1.text(0.1, 0.55, peri2_template, transform=ax1.transAxes) # 図形の枠を基準にした位置にテキストが挿入
-
-ax1.plot(af_list,xamp, 'r')
-ax1.vlines(afreq, 0, 1.2*xamp_max, 'g', ls='dashed', lw=1)
-
+ax1 = fig.add_subplot(111)
 ax2 = ax1.twinx()
-ax2.grid(ls='dotted')
-ax2.set_ylim(0,180)
-ax2.set_ylabel(r'$\theta_{{out}}$ /$\degree$')
-ax2.plot(af_list,xpha, 'b')
-ax2.hlines(90, 0, 1.2*xamp_max, 'g', ls='dashed', lw=1)
+ax1.set_ylim(-3*Fa, 3*Fa)
+ax2.set_ylim(-2*xamp_max, 2*xamp_max)
+ax1.grid(False)
+ax2.grid(True)
+ax1.set_axisbelow(True)
+ax2.set_axisbelow(True)
+ax1.set_xlabel('$t$ [s]')
+ax1.set_ylabel('$A_{{in}}$ [N]')
+ax2.set_ylabel('$A_{{out}}$ [m]')
+peri1_template = r'$\omega_r$ = {0:.2f} s$^{{-1}}$'.format(afreq)
+ax1.text(0.1, 0.8, peri1_template, transform=ax1.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
-savefile = './png/forced_harmonicOsci_freqSweep_(k={0:.1f},m={1:.1f},c={2:.1f}).png'.format(k,m,c)
-fig.savefig(savefile, dpi=300)
+input, = ax1.plot([], [], 'r', animated=True, label='force (input) [N]')
+output, = ax2.plot([], [], 'b', animated=True, label='displacement (output) [m]')
+# ここでは[],[]としているが、下で***.set_data([0, l + x[i]], [0, 0])で実際の値を入れている
+
+ax1.legend(loc="upper right")
+ax2.legend(loc="lower right")
+
+amp_o_template = r'$A_{{out}}$ = %.1f m'
+amp_o_text = ax1.text(0.35, 0.9, '', transform=ax1.transAxes)
+
+pha_o_template = r'$\theta_{{out}}$ = %.1f$\degree$'
+pha_o_text = ax1.text(0.35, 0.8, '', transform=ax1.transAxes)
+
+peri2_template = r'$\omega_f$ = %.2f s$^{{-1}}$'
+peri2_text = ax1.text(0.1, 0.7, '', transform=ax1.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+
+time_template = '$t$ = %.2f s'
+time_text = ax1.text(0.1, 0.9, '', transform=ax1.transAxes) # 図形の枠を基準にした位置にテキストが挿入
+# また、ここでは''としているが、下で time_text.set_textで実際のテキストを入れている
+
+def init():                 # FuncAnimationでinit_funcで呼び出す
+    time_text.set_text('')
+    return input, output, time_text, peri2_text, amp_o_text, pha_o_text
+
+def update(i):              # ここのiは下のframes=fに対応した引数になっている
+    if i < 200:
+        ax1.set_xlim(0,t_ani[200])
+        input.set_data([t_ani[:i]],[xi[:i]])
+        output.set_data([t_ani[:i]],[xo[:i]])
+    else:
+        ax1.set_xlim(t_ani[i-200],t_ani[i])
+        input.set_data([t_ani[i-200:i]],[xi[i-200:i]])
+        output.set_data([t_ani[i-200:i]],[xo[i-200:i]])
+    time_text.set_text(time_template % (i*dt))
+    peri2_text.set_text(peri2_template % af_ani[i])
+    amp_o_text.set_text(amp_o_template % xamp_ani[i])
+    pha_o_text.set_text(pha_o_template % xpha_ani[i])
+    return input, output, time_text, peri2_text, amp_o_text, pha_o_text
+
+'''
+y_triの中の重要部分は
+x_tri1 = np.linspace(a, b,100)
+のとき
+(xtri - a)/(b - a)
+になる 
+'''
+
+f = np.arange(0, i_ani)
+frame_int = 1000 * dt       # [ms] interval between frames
+fps = 1000/frame_int        # frames per second
+
+ani = FuncAnimation(fig, update, frames=f,
+                    init_func=init, blit=True, interval=frame_int, repeat=True)
+
+savefile = './gif/forced_harmonicOsci_ani_timeChart_(k={0:.1f},m={1:.1f},c={2:.1f}).gif'.format(k,m,c)
+ani.save(savefile, writer='pillow', fps=fps)
 
 plt.show()

@@ -100,17 +100,13 @@ for af in af_list:
     xpha.append(xo_pha)                             # 出力位相を格納
     xpha_ani.extend([n*xo_pha for n in one_list])   # 最大振幅を格納（アニメーション用）   
 
-print(af_list)
-print(xamp)
-print(xpha)
-
 fig = plt.figure()
 ax = fig.add_subplot(111, xlim=(-5, 50), ylim=(-5, 5))
 ax.grid()
 ax.set_axisbelow(True)
 ax.set_xlabel('$x$ position [m]')
 amp_i_template = r'$A_{{in}}$ = {0:.1f} N'.format(Fa)
-ax.text(0.65, 0.3, amp_i_template, transform=ax.transAxes)
+ax.text(0.75, 0.3, amp_i_template, transform=ax.transAxes)
 x_rod1 = [0, l/4]
 y = [0, 0]
 ax.plot(x_rod1,y, c='b')
@@ -129,10 +125,10 @@ peri2_template = r'$\omega_f$ = %.2f s$^{{-1}}$'
 peri2_text = ax.text(0.45, 0.8, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
 amp_o_template = r'$A_{{out}}$ = %.1f m'
-amp_o_text = ax.text(0.65, 0.5, '', transform=ax.transAxes)
+amp_o_text = ax.text(0.75, 0.5, '', transform=ax.transAxes)
 
 pha_o_template = r'$\theta_{{out}}$ = %.1f$\degree$'
-pha_o_text = ax.text(0.65, 0.45, '', transform=ax.transAxes)
+pha_o_text = ax.text(0.75, 0.45, '', transform=ax.transAxes)
 
 time_template = '$t$ = %.2f s'
 time_text = ax.text(0.1, 0.9, '', transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入

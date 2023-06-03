@@ -106,8 +106,9 @@ fig = plt.figure()
 ax = fig.add_subplot(111, xlim=(-1.5*Fa, 1.5*Fa), ylim=(-1.5*xamp_max, 1.5*xamp_max))
 ax.grid()
 ax.set_axisbelow(True)
-ax.set_xlabel('$x$ position [m]')
-peri1_template = r'$\omega_r$ = {0:.2f} s$^{{-1}}$,'.format(afreq)
+ax.set_xlabel('force (input) [N]')
+ax.set_ylabel('displacement (output) [m]')
+peri1_template = r'$\omega_r$ = {0:.2f} s$^{{-1}}$'.format(afreq)
 ax.text(0.1, 0.8, peri1_template, transform=ax.transAxes) # 図形の枠を基準にした位置にテキストが挿入
 
 lissajous, = plt.plot([], [], 'r', animated=True)
@@ -131,7 +132,10 @@ def init():                 # FuncAnimationでinit_funcで呼び出す
     return lissajous, time_text, peri2_text, amp_o_text, pha_o_text
 
 def update(i):              # ここのiは下のframes=fに対応した引数になっている
-    lissajous.set_data([xi[i-100:i]],[xo[i-100:i]])
+    if i < 100:
+        lissajous.set_data([xi[:i]],[xo[:i]])
+    else:
+        lissajous.set_data([xi[i-100:i]],[xo[i-100:i]])
     time_text.set_text(time_template % (i*dt))
     peri2_text.set_text(peri2_template % af_ani[i])
     amp_o_text.set_text(amp_o_template % xamp_ani[i])
